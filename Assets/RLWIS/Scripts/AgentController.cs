@@ -2,46 +2,39 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
-using PA_DronePack;
 
-public class DroneAgent : Agent
+public class AgentController : Agent
 {
-    private PA_DroneController dcoScript;
-
-    public DroneSetting area;
+    public GameObject env;
     public GameObject goal;
+    public GameObject model;
 
-    float preDist;
+    private EnvController envController;
 
-    private Transform agentTrans;
+    private float preDist;
+    private Transform modelTrans;
     private Transform goalTrans;
-
-    private Rigidbody agent_Rigidbody;
 
     public override void Initialize()
     {
-        dcoScript = gameObject.GetComponent<PA_DroneController>();
+        envController = env.GetComponent<EnvController>();
 
-        agentTrans = gameObject.transform;
+        modelTrans = model.transform;
         goalTrans = goal.transform;
-
-        agent_Rigidbody = gameObject.GetComponent<Rigidbody>();
 
         Academy.Instance.AgentPreStep += WaitTimeInference;
     }
 
     public override void OnEpisodeBegin()
     {
-        area.AreaSetting();
+        envController.AreaSetting();
 
-        preDist = Vector3.Magnitude(goalTrans.position - agentTrans.position);
+        preDist = Vector3.Magnitude(goalTrans.position - modelTrans.position);
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        sensor.AddObservation(agentTrans.position - goalTrans.position);
-        sensor.AddObservation(agent_Rigidbody.velocity);
-        sensor.AddObservation(agent_Rigidbody.angularVelocity);
+        sensor.AddObservation(modelTrans.position - goalTrans.position);
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
@@ -54,18 +47,16 @@ public class DroneAgent : Agent
         float moveY = Mathf.Clamp(actions[1], -1, 1f);
         float moveZ = Mathf.Clamp(actions[2], -1, 1f);
 
-        dcoScript.DriveInput(moveX);
-        dcoScript.StrafeInput(moveY);
-        dcoScript.LiftInput(moveZ);
+        envController.MoveModel(moveX, moveY, moveZ);
 
-        float distance = Vector3.Magnitude(goalTrans.position - agentTrans.position);
+        float distance = Vector3.Magnitude(goalTrans.position - modelTrans.position);
 
-        if (distance <= 0.5f)
+        if (distance <= 0.5f) // Terminal state 0 : Goal
         {
             SetReward(1f);
             EndEpisode();
         }
-        else if (distance > 10f)
+        else if (distance > 10f)  // Terminal state 0 : Fail (Out of area)
         {
             SetReward(-1f);
             EndEpisode();
@@ -82,9 +73,9 @@ public class DroneAgent : Agent
     {
         var continuousActionsOut = actionsOut.ContinuousActions;
 
-        continuousActionsOut[0] = Input.GetAxis("Vertical");
-        continuousActionsOut[1] = Input.GetAxis("Horizontal");
-        continuousActionsOut[2] = Input.GetAxis("Mouse ScrollWheel");
+        continuousActionsOut[0] = Input.GetAxis("Horizontal"); // X-axis
+        continuousActionsOut[1] = Input.GetAxis("Mouse ScrollWheel"); // Y-axis
+        continuousActionsOut[2] = Input.GetAxis("Vertical"); // Z-axis
     }
 
     public float DecisionWaitingTime = 5f;
