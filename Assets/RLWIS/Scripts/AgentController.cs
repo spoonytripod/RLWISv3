@@ -15,9 +15,15 @@ public class AgentController : Agent
     private Transform modelTrans;
     private Transform goalTrans;
 
+    private float goalDistance;
+    private float failDistance;
+
     public override void Initialize()
     {
         envController = env.GetComponent<EnvController>();
+
+        goalDistance = envController.goalDistance;
+        failDistance = envController.failDistance;
 
         modelTrans = model.transform;
         goalTrans = goal.transform;
@@ -51,12 +57,12 @@ public class AgentController : Agent
 
         float distance = Vector3.Magnitude(goalTrans.position - modelTrans.position);
 
-        if (distance <= 0.5f) // Terminal state 0 : Goal
+        if (distance <= goalDistance) // Terminal state 0 : Goal
         {
             SetReward(1f);
             EndEpisode();
         }
-        else if (distance > 10f)  // Terminal state 0 : Fail (Out of area)
+        else if (distance > failDistance)  // Terminal state 0 : Fail (Out of area)
         {
             SetReward(-1f);
             EndEpisode();

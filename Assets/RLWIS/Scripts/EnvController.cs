@@ -5,6 +5,13 @@ public class EnvController : MonoBehaviour
 {
     public GameObject Goal;
     public GameObject Model;
+    private PoseCalculator poseCalculator;
+
+    [Space(10)]
+    [Range(1f, 10f)] public float randPosInnerRatio;
+    [Range(1f, 10f)] public float randPosOuterRatio;
+    public float goalDistance;
+    public float failDistance;
 
     private Transform AreaTrans;
     private Transform GoalTrans;
@@ -17,6 +24,9 @@ public class EnvController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        poseCalculator = gameObject.GetComponent<PoseCalculator>();
+        poseCalculator.DetectMarkers();
+
         AreaTrans = gameObject.transform;
         ModelTrans = Model.transform;
         GoalTrans = Goal.transform;
@@ -37,6 +47,7 @@ public class EnvController : MonoBehaviour
         GoalTrans.position = goalInitPos;
         GoalTrans.rotation = goalInitRot;
 
-        ModelTrans.position = areaInitPos + new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f), Random.Range(-5f, 5f));
+        Vector3 randPos = Random.onUnitSphere * Random.Range(goalDistance * randPosInnerRatio, goalDistance * randPosOuterRatio);
+        ModelTrans.position = areaInitPos + randPos;
     }
 }
