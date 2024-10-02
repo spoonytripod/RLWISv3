@@ -1,14 +1,17 @@
 using OpenCVForUnity.Calib3dModule;
 using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.ImgcodecsModule;
 using OpenCVForUnity.ObjdetectModule;
 using OpenCVForUnity.UnityUtils;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class PoseCalculator : MonoBehaviour
 {
     public GameObject arGameObject;
+    public GameObject quadObject;
     public Camera arCamera;
     public Texture2D imgTexture;
     public ArUcoDictionary dictionaryId = ArUcoDictionary.DICT_6X6_250;
@@ -24,34 +27,20 @@ public class PoseCalculator : MonoBehaviour
     Mat undistortedRgbMat;
     Texture2D texture;
 
-
-    // Start is called before the first frame update
-    void Awake()
+    public void DetectMarkers()
     {
         rgbMat = new Mat(imgTexture.height, imgTexture.width, CvType.CV_8UC3);
         texture = new Texture2D(rgbMat.cols(), rgbMat.rows(), TextureFormat.RGBA32, false);
-        // gameObject.GetComponent<Renderer>().material.mainTexture = texture;
-
+        quadObject.GetComponent<Renderer>().material.mainTexture = texture;
         undistortedRgbMat = new Mat();
 
-        DetectMarkers();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    public void DetectMarkers()
-    {
         // If true, The error log of the Native side OpenCV will be displayed on the Unity Editor Console.
         Utils.setDebugMode(true);
 
         Utils.texture2DToMat(imgTexture, rgbMat);
         Debug.Log("imgMat dst ToString " + rgbMat.ToString());
 
-        // gameObject.transform.localScale = new Vector3(imgTexture.width, imgTexture.height, 1);
+        quadObject.transform.localScale = new Vector3(imgTexture.width, imgTexture.height, 1);
         // Debug.Log("Screen.width " + Screen.width + " Screen.height " + Screen.height + " Screen.orientation " + Screen.orientation);
 
         float width = rgbMat.width();

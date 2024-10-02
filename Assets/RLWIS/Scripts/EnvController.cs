@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEngine;
 using Unity.MLAgents;
 
@@ -21,10 +22,16 @@ public class EnvController : MonoBehaviour
     private Vector3 goalInitPos;
     private Quaternion goalInitRot;
 
+    [Header("Directory settings")]
+    private int targetImgIndex;
+
     // Start is called before the first frame update
     void Start()
     {
         poseCalculator = gameObject.GetComponent<PoseCalculator>();
+        targetImgIndex = 1;
+
+        SetTarget();
         poseCalculator.DetectMarkers();
 
         AreaTrans = gameObject.transform;
@@ -49,5 +56,24 @@ public class EnvController : MonoBehaviour
 
         Vector3 randPos = Random.onUnitSphere * Random.Range(goalDistance * randPosInnerRatio, goalDistance * randPosOuterRatio);
         ModelTrans.position = areaInitPos + randPos;
+    }
+
+    public void SetTarget()
+    {
+        Texture2D targetTexture = Resources.Load<Texture2D>("Targets/" + targetImgIndex.ToString());
+        poseCalculator.imgTexture = targetTexture;
+    }
+    public void NextTarget()
+    {
+        targetImgIndex += 1;
+        SetTarget();
+        poseCalculator.DetectMarkers();
+    }
+
+    public void PrevTarget()
+    {
+        targetImgIndex -= 1;
+        SetTarget();
+        poseCalculator.DetectMarkers();
     }
 }
