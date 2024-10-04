@@ -10,7 +10,9 @@ public class EnvController : MonoBehaviour
     private PoseCalculator poseCalculator;
 
     [Space(10)]
-    public int imgAmount;
+    public int targetImgAmount;
+    public ChangeTargetMode changeTargetMode;
+    [Range(0, 10)] public int changeTargetPeriod;
     [Range(1f, 10f)] public float randPosInnerRatio;
     [Range(1f, 10f)] public float randPosOuterRatio;
     public float goalDistance;
@@ -29,7 +31,7 @@ public class EnvController : MonoBehaviour
         poseCalculator = gameObject.GetComponent<PoseCalculator>();
         targetImgIndex = 1;
 
-        SetTarget();
+        LoadTexture();
         poseCalculator.DetectMarkers();
 
         AreaTrans = gameObject.transform;
@@ -64,7 +66,7 @@ public class EnvController : MonoBehaviour
         ModelTrans.rotation = randRot;
     }
 
-    public void SetTarget()
+    public void LoadTexture()
     {
         Texture2D targetTexture = Resources.Load<Texture2D>("Targets/" + targetImgIndex.ToString());
         poseCalculator.imgTexture = targetTexture;
@@ -72,7 +74,7 @@ public class EnvController : MonoBehaviour
     public void NextTarget()
     {
         targetImgIndex += 1;
-        SetTarget();
+        LoadTexture();
         try
         {
             poseCalculator.DetectMarkers();
@@ -80,7 +82,7 @@ public class EnvController : MonoBehaviour
         catch (NullReferenceException ex)
         {
             targetImgIndex = 0;
-            SetTarget();
+            LoadTexture();
             poseCalculator.DetectMarkers();
         }
     }
@@ -88,16 +90,25 @@ public class EnvController : MonoBehaviour
     public void PrevTarget()
     {
         targetImgIndex -= 1;
-        SetTarget();
+        LoadTexture();
         try
         {
             poseCalculator.DetectMarkers();
         }
         catch (NullReferenceException ex)
         {
-            targetImgIndex = imgAmount - 1;
-            SetTarget();
+            targetImgIndex = targetImgAmount - 1;
+            LoadTexture();
             poseCalculator.DetectMarkers();
         }
     }
+
+    public void RandomTarget()
+    {
+        targetImgIndex = UnityEngine.Random.Range(0, targetImgAmount);
+        LoadTexture();
+        poseCalculator.DetectMarkers();
+    }
+
+    public enum ChangeTargetMode { Single, Sequential, Random }
 }
