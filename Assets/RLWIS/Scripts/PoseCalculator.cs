@@ -22,7 +22,9 @@ public class PoseCalculator : MonoBehaviour
     [Space(10)]
 
     public bool shouldMoveARCamera = false;
-    public Matrix4x4 ARM;
+    public Matrix4x4 ARM_Object;
+    public Matrix4x4 ARM_Camera;
+
     Mat rgbMat;
     Mat undistortedRgbMat;
     Texture2D texture;
@@ -195,26 +197,26 @@ public class PoseCalculator : MonoBehaviour
 
                             // right-handed coordinates system (OpenCV) to left-handed one (Unity)
                             // https://stackoverflow.com/questions/30234945/change-handedness-of-a-row-major-4x4-transformation-matrix
-                            ARM = invertYM * transformationM * invertYM;
+                            ARM_Object = invertYM * transformationM * invertYM;
 
                             if (shouldMoveARCamera)
                             {
 
-                                ARM = arGameObject.transform.localToWorldMatrix * ARM.inverse;
+                                ARM_Camera = arGameObject.transform.localToWorldMatrix * ARM_Object.inverse;
 
-                                Debug.Log("ARM " + ARM.ToString());
+                                Debug.Log("ARM_Camera " + ARM_Camera.ToString());
 
-                                ARUtils.SetTransformFromMatrix(arCamera.transform, ref ARM);
+                                ARUtils.SetTransformFromMatrix(arCamera.transform, ref ARM_Camera);
 
                             }
                             else
                             {
 
-                                ARM = arCamera.transform.localToWorldMatrix * ARM;
+                                ARM_Object = arCamera.transform.localToWorldMatrix * ARM_Object;
 
-                                Debug.Log("ARM " + ARM.ToString());
+                                Debug.Log("ARM " + ARM_Object.ToString());
 
-                                ARUtils.SetTransformFromMatrix(arGameObject.transform, ref ARM);
+                                ARUtils.SetTransformFromMatrix(arGameObject.transform, ref ARM_Object);
                             }
 
                         }

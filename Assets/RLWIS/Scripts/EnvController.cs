@@ -1,6 +1,7 @@
 using System.IO;
 using UnityEngine;
 using Unity.MLAgents;
+using OpenCVForUnity.UnityUtils;
 
 public class EnvController : MonoBehaviour
 {
@@ -18,10 +19,6 @@ public class EnvController : MonoBehaviour
     private Transform GoalTrans;
     private Transform ModelTrans;
 
-    private Vector3 areaInitPos;
-    private Vector3 goalInitPos;
-    private Quaternion goalInitRot;
-
     [Header("Directory settings")]
     private int targetImgIndex;
 
@@ -38,24 +35,32 @@ public class EnvController : MonoBehaviour
         ModelTrans = Model.transform;
         GoalTrans = Goal.transform;
 
-        areaInitPos = AreaTrans.position;
-        goalInitPos = GoalTrans.position;
-        goalInitRot = GoalTrans.rotation;
+        // areaInitPos = AreaTrans.position;
+        // goalInitPos = GoalTrans.position;
+        // goalInitRot = GoalTrans.rotation;
     }
 
     public void MoveModel(float x, float y, float z)
     {
         Vector3 direction = new Vector3(x, y, z);
-        Model.transform.Translate(direction);
+        Model.transform.Translate(direction, Space.World); // Translate in World coordinates
     }
 
     public void AreaSetting()
     {
-        GoalTrans.position = goalInitPos;
-        GoalTrans.rotation = goalInitRot;
+        Matrix4x4 ARM = poseCalculator.ARM_Object;
 
+        // Set Random values
         Vector3 randPos = Random.onUnitSphere * Random.Range(goalDistance * randPosInnerRatio, goalDistance * randPosOuterRatio);
-        ModelTrans.position = areaInitPos + randPos;
+        Quaternion randRot = GoalTrans.rotation; // 6DOF 랜덤 Rotation  적용하기 전까지 이대로 사용
+
+        // Set position and rotation of the Goal
+        GoalTrans.position = ARUtils.ExtractTranslationFromMatrix(ref ARM);
+        GoalTrans.rotation = ARUtils.ExtractRotationFromMatrix(ref ARM);
+
+        // Set position and rotation of the Model
+        ModelTrans.position = GoalTrans.position + randPos;
+        ModelTrans.rotation = randRot;
     }
 
     public void SetTarget()

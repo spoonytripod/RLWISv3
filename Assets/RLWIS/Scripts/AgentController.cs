@@ -82,6 +82,19 @@ public class AgentController : Agent
         continuousActionsOut[0] = Input.GetAxis("Horizontal"); // X-axis
         continuousActionsOut[1] = Input.GetAxis("Mouse ScrollWheel"); // Y-axis
         continuousActionsOut[2] = Input.GetAxis("Vertical"); // Z-axis
+
+        if (Input.GetKey(KeyCode.PageUp))
+        {
+            envController.NextTarget();
+            envController.AreaSetting();
+        }
+        if (Input.GetKey(KeyCode.PageDown))
+        {
+            envController.PrevTarget();
+            envController.AreaSetting();
+        }
+
+
     }
 
     public float DecisionWaitingTime = 5f;
