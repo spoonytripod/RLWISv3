@@ -40,7 +40,7 @@ public class AgentController : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        sensor.AddObservation(modelTrans.position - goalTrans.position);
+        // sensor.AddObservation(modelTrans.position - goalTrans.position);
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)

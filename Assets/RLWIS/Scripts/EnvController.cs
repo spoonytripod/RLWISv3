@@ -13,6 +13,7 @@ public class EnvController : MonoBehaviour
     public int targetImgAmount;
     public ChangeTargetMode changeTargetMode;
     [Range(0, 10)] public int changeTargetPeriod;
+    [Tooltip("Only for 'Single' mode, start from 0")]
     [Range(1f, 10f)] public float randPosInnerRatio;
     [Range(1f, 10f)] public float randPosOuterRatio;
     public float goalDistance;
@@ -110,5 +111,5 @@ public class EnvController : MonoBehaviour
         poseCalculator.DetectMarkers();
     }
 
-    public enum ChangeTargetMode { Single, Sequential, Random }
+    public enum ChangeTargetMode { Sequential, Random, Single }
 }
